@@ -1,4 +1,4 @@
-package com.coderscampus.assignment;
+package com.coderscampus.assignment.com.coderscampus.assignment;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,7 +17,7 @@ public class Assignment8 {
         try {
             // Make sure you download the output.txt file for Assignment 8
             // and place the file in the root of your Java project
-            numbers = Files.readAllLines(Paths.get("output.txt"))
+            numbers = Files.readAllLines(Paths.get("com/coderscampus/assignment/output.txt"))
                     .stream()
                     .map(n -> Integer.parseInt(n))
                     .collect(Collectors.toList());
