@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -56,6 +57,53 @@ public class Assignment8 {
                 });
         System.out.println("Done Fetching records " + start + " to " + (end));
         return newList;
+    }
+
+    public static void updateValues(Integer number, ConcurrentMap<Integer,Integer> seenNumbers) {
+        synchronized (seenNumbers) {
+            if (seenNumbers.containsKey(number)) {
+                Integer incrementValue = seenNumbers.get(number);
+                incrementValue++;
+                seenNumbers.put(number,incrementValue);
+            }
+        }
+
+    }
+
+    public static void main(String[] args) {
+        Assignment8 assignment = new Assignment8();
+
+        ExecutorService fetchPool = Executors.newCachedThreadPool();
+        ConcurrentMap<Integer,Integer> seenNumbers = new ConcurrentHashMap<>();
+
+        //Setting keys of the map for unique instances of a number's occurrence
+        for (Integer i = 0; i < 15; i++) {
+            seenNumbers.put(i, 0);
+        }
+        List<CompletableFuture<Void>> tasks = new ArrayList<>();
+
+
+
+        //Assigning values to the hashmap for identifying unique records
+        for (int i = 0; i < 1000; i++) {
+            CompletableFuture<Void> task = CompletableFuture.supplyAsync(assignment::getNumbers, fetchPool)
+                    .thenAcceptAsync(numbers -> {
+                         numbers.stream().forEach(number -> {updateValues(number,seenNumbers);
+                         });
+                    }, fetchPool);
+
+            tasks.add(task);
+        }
+
+        //Keep main thread alive until threads are done and print results to the end
+        while (tasks.stream().filter(CompletableFuture::isDone).count() < 1000) {
+
+            if (tasks.stream().filter(CompletableFuture::isDone).count() == 999) {
+                System.out.println("______________________________________________________");
+                seenNumbers.entrySet().stream().forEach(group -> System.out.println(group));
+            }
+        }
+
     }
 
 }
