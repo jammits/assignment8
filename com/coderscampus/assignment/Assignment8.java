@@ -95,14 +95,13 @@ public class Assignment8 {
             tasks.add(task);
         }
 
-        //Keep main thread alive until threads are done and print results to the end
-        while (tasks.stream().filter(CompletableFuture::isDone).count() < 1000) {
+        //Waiting for all threads to complete using allOf
+        CompletableFuture<Void> combinedFutures = CompletableFuture.allOf(tasks.toArray(new CompletableFuture[tasks.size()]));
+        //Waiting for combineFutures to finish waiting on all threads
+        combinedFutures.join();
 
-            if (tasks.stream().filter(CompletableFuture::isDone).count() == 999) {
-                System.out.println("______________________________________________________");
-                seenNumbers.entrySet().stream().forEach(group -> System.out.println(group));
-            }
-        }
+        seenNumbers.entrySet().stream().forEach(group -> System.out.println(group));
+
 
     }
 
