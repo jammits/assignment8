@@ -102,6 +102,9 @@ public class Assignment8 {
 
         seenNumbers.entrySet().stream().forEach(group -> System.out.println(group));
 
+        //Close thread pool once done
+        fetchPool.shutdown();
+
 
     }
 
